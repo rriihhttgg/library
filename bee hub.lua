@@ -1,5 +1,3 @@
--- v0.0.2
-
 -- GuiLib.lua
 local GuiLib = {}
 GuiLib.__index = GuiLib
@@ -136,11 +134,22 @@ function GuiLib:CreateWindow(config)
     bgImage.Size = UDim2.new(1, 0, 1, 0)
     bgImage.BackgroundTransparency = 1
     bgImage.Image = config.BackgroundImage or ""
-    bgImage.ImageTransparency = (config.BackgroundImage and 0) or 1
+    bgImage.ImageTransparency = config.BackgroundImage and 0 or 1
     bgImage.ScaleType = Enum.ScaleType.Crop
-    bgImage.ZIndex = 0
+    bgImage.ZIndex = 2
     bgImage.Parent = frame
     addCorner(bgImage)
+
+    -- Затемнение поверх картинки
+    local bgOverlay = Instance.new("Frame")
+    bgOverlay.Name = "BgOverlay"
+    bgOverlay.Size = UDim2.new(1, 0, 1, 0)
+    bgOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    bgOverlay.BackgroundTransparency = config.BackgroundImage and 0.4 or 1
+    bgOverlay.BorderSizePixel = 0
+    bgOverlay.ZIndex = 3
+    bgOverlay.Parent = frame
+    addCorner(bgOverlay)
 
     -- Топбар
     local topBar = Instance.new("Frame")
@@ -149,6 +158,7 @@ function GuiLib:CreateWindow(config)
     topBar.BackgroundColor3 = theme.TopBar
     topBar.BackgroundTransparency = theme.Transparency
     topBar.BorderSizePixel = 0
+    topBar.ZIndex = 4
     topBar.Parent = frame
     addCorner(topBar)
 
@@ -158,6 +168,7 @@ function GuiLib:CreateWindow(config)
     patch.BackgroundColor3 = theme.TopBar
     patch.BackgroundTransparency = theme.Transparency
     patch.BorderSizePixel = 0
+    patch.ZIndex = 4
     patch.Parent = topBar
 
     -- Акцентная полоса
@@ -166,6 +177,7 @@ function GuiLib:CreateWindow(config)
     accent.Position = UDim2.new(0, 10, 0, 8)
     accent.BackgroundColor3 = theme.Accent
     accent.BorderSizePixel = 0
+    accent.ZIndex = 5
     accent.Parent = topBar
     addCorner(accent, UDim.new(1, 0))
 
@@ -179,6 +191,7 @@ function GuiLib:CreateWindow(config)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextSize = 14
+    titleLabel.ZIndex = 5
     titleLabel.Parent = topBar
 
     -- Кнопка закрытия
@@ -192,6 +205,7 @@ function GuiLib:CreateWindow(config)
     closeBtn.TextSize = 13
     closeBtn.BorderSizePixel = 0
     closeBtn.AutoButtonColor = false
+    closeBtn.ZIndex = 5
     closeBtn.Parent = topBar
     addCorner(closeBtn, UDim.new(0, 6))
 
@@ -244,6 +258,7 @@ function GuiLib:CreateWindow(config)
     content.ScrollBarImageColor3 = theme.Accent
     content.CanvasSize = UDim2.new(0, 0, 0, 0)
     content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    content.ZIndex = 4
     content.Parent = frame
 
     local listLayout = Instance.new("UIListLayout")
@@ -258,6 +273,7 @@ function GuiLib:CreateWindow(config)
     window._patch     = patch
     window._accent    = accent
     window._bgImage   = bgImage
+    window._bgOverlay = bgOverlay
     window._stroke    = frameStroke
     window._content   = content
     window._theme     = theme
@@ -279,12 +295,12 @@ function GuiLib:SetTheme(presetName)
     self._theme.Accent     = preset.Accent
     self._theme.Border     = preset.Border
 
-    self._frame.BackgroundColor3          = preset.Background
-    self._topBar.BackgroundColor3         = preset.TopBar
-    self._patch.BackgroundColor3          = preset.TopBar
-    self._accent.BackgroundColor3         = preset.Accent
-    self._stroke.Color                    = preset.Border
-    self._scrollbar.ScrollBarImageColor3  = preset.Accent
+    self._frame.BackgroundColor3         = preset.Background
+    self._topBar.BackgroundColor3        = preset.TopBar
+    self._patch.BackgroundColor3         = preset.TopBar
+    self._accent.BackgroundColor3        = preset.Accent
+    self._stroke.Color                   = preset.Border
+    self._scrollbar.ScrollBarImageColor3 = preset.Accent
 end
 
 -- =====================
@@ -321,19 +337,43 @@ function GuiLib:SetTransparency(value)
 end
 
 -- =====================
---  :SetBackgroundImage(assetId, transparency)
+--  :SetBackgroundImage(assetId, transparency, overlayTransparency)
+--  assetId              = "rbxassetid://123456"
+--  transparency         = прозрачность картинки 0–1
+--  overlayTransparency  = прозрачность затемнения 0–1 (0.4 по умолчанию)
 -- =====================
-function GuiLib:SetBackgroundImage(assetId, transparency)
-    self._bgImage.Image = assetId or ""
+function GuiLib:SetBackgroundImage(assetId, transparency, overlayTransparency)
+    self._bgImage.Image             = assetId or ""
     self._bgImage.ImageTransparency = math.clamp(transparency or 0, 0, 1)
+    self._bgOverlay.BackgroundTransparency = math.clamp(overlayTransparency or 0.4, 0, 1)
+
+    -- Делаем фон окна прозрачным чтобы была видна картинка
+    self._frame.BackgroundTransparency  = 0.15
+    self._topBar.BackgroundTransparency = 0.3
+    self._patch.BackgroundTransparency  = 0.3
+end
+
+-- =====================
+--  :SetOverlayDim(value)
+--  Затемнение поверх картинки 0–1
+--  0 = нет затемнения, 1 = полностью чёрное
+-- =====================
+function GuiLib:SetOverlayDim(value)
+    self._bgOverlay.BackgroundTransparency = math.clamp(1 - value, 0, 1)
 end
 
 -- =====================
 --  :RemoveBackgroundImage()
 -- =====================
 function GuiLib:RemoveBackgroundImage()
-    self._bgImage.Image = ""
-    self._bgImage.ImageTransparency = 1
+    self._bgImage.Image                    = ""
+    self._bgImage.ImageTransparency        = 1
+    self._bgOverlay.BackgroundTransparency = 1
+
+    -- Возвращаем непрозрачность
+    self._frame.BackgroundTransparency  = self._theme.Transparency
+    self._topBar.BackgroundTransparency = self._theme.Transparency
+    self._patch.BackgroundTransparency  = self._theme.Transparency
 end
 
 -- =====================
@@ -347,14 +387,13 @@ function GuiLib:AddButton(config)
 
     local theme = self._theme
 
-    -- Контейнер
     local container = Instance.new("Frame")
     container.Name = "ButtonContainer"
     container.Size = UDim2.new(1, 0, 0, 42)
     container.BackgroundTransparency = 1
+    container.ZIndex = 5
     container.Parent = self._content
 
-    -- Кнопка
     local btn = Instance.new("TextButton")
     btn.Name = "Button"
     btn.Size = UDim2.new(1, 0, 1, 0)
@@ -363,20 +402,20 @@ function GuiLib:AddButton(config)
     btn.Text = ""
     btn.BorderSizePixel = 0
     btn.AutoButtonColor = false
+    btn.ZIndex = 5
     btn.Parent = container
     addCorner(btn)
     addStroke(btn, theme.Border)
 
-    -- Акцентная полоска слева
     local leftBar = Instance.new("Frame")
     leftBar.Size = UDim2.new(0, 3, 0.6, 0)
     leftBar.Position = UDim2.new(0, 0, 0.2, 0)
     leftBar.BackgroundColor3 = theme.Accent
     leftBar.BorderSizePixel = 0
+    leftBar.ZIndex = 6
     leftBar.Parent = btn
     addCorner(leftBar, UDim.new(1, 0))
 
-    -- Иконка
     local iconLabel = Instance.new("TextLabel")
     iconLabel.Size = UDim2.new(0, 30, 1, 0)
     iconLabel.Position = UDim2.new(0, 12, 0, 0)
@@ -385,9 +424,9 @@ function GuiLib:AddButton(config)
     iconLabel.TextColor3 = theme.Accent
     iconLabel.Font = Enum.Font.GothamBold
     iconLabel.TextSize = 16
+    iconLabel.ZIndex = 6
     iconLabel.Parent = btn
 
-    -- Текст
     local textOffset = (config.Icon and 40) or 14
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -textOffset - 10, 1, 0)
@@ -398,9 +437,9 @@ function GuiLib:AddButton(config)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Font = Enum.Font.Gotham
     label.TextSize = 13
+    label.ZIndex = 6
     label.Parent = btn
 
-    -- Описание
     if config.Description then
         label.Size = UDim2.new(1, -textOffset - 10, 0.45, 0)
         label.Position = UDim2.new(0, textOffset, 0.08, 0)
@@ -416,10 +455,10 @@ function GuiLib:AddButton(config)
         sub.TextXAlignment = Enum.TextXAlignment.Left
         sub.Font = Enum.Font.Gotham
         sub.TextSize = 11
+        sub.ZIndex = 6
         sub.Parent = btn
     end
 
-    -- Стрелка
     local arrow = Instance.new("TextLabel")
     arrow.Size = UDim2.new(0, 24, 1, 0)
     arrow.Position = UDim2.new(1, -28, 0, 0)
@@ -428,9 +467,9 @@ function GuiLib:AddButton(config)
     arrow.TextColor3 = theme.Accent
     arrow.Font = Enum.Font.GothamBold
     arrow.TextSize = 22
+    arrow.ZIndex = 6
     arrow.Parent = btn
 
-    -- Анимации
     local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
     local function animateTo(bgColor, arrowOffset)
@@ -456,7 +495,6 @@ function GuiLib:AddButton(config)
         if config.Callback then config.Callback() end
     end)
 
-    -- Объект кнопки
     local buttonObj = {}
 
     function buttonObj:SetText(text)
