@@ -9,16 +9,15 @@ local TweenService     = game:GetService("TweenService")
 --  Дефолтная тема
 -- =====================
 local DefaultTheme = {
-    Background      = Color3.fromRGB(30, 30, 35),
-    TopBar          = Color3.fromRGB(20, 20, 25),
-    Accent          = Color3.fromRGB(100, 160, 255),
-    Text            = Color3.fromRGB(240, 240, 240),
-    TextDim         = Color3.fromRGB(160, 160, 170),
-    Border          = Color3.fromRGB(55, 55, 65),
-    CornerRadius    = UDim.new(0, 8),
-    Transparency    = 0,
-    BackgroundImage = "",
-    ImageTransp     = 0,
+    Background   = Color3.fromRGB(30, 30, 35),
+    TopBar       = Color3.fromRGB(20, 20, 25),
+    Sidebar      = Color3.fromRGB(22, 22, 28),
+    Accent       = Color3.fromRGB(100, 160, 255),
+    Text         = Color3.fromRGB(240, 240, 240),
+    TextDim      = Color3.fromRGB(160, 160, 170),
+    Border       = Color3.fromRGB(55, 55, 65),
+    CornerRadius = UDim.new(0, 8),
+    Transparency = 0,
 }
 
 -- =====================
@@ -28,36 +27,42 @@ GuiLib.Themes = {
     Dark = {
         Background = Color3.fromRGB(30, 30, 35),
         TopBar     = Color3.fromRGB(20, 20, 25),
+        Sidebar    = Color3.fromRGB(22, 22, 28),
         Accent     = Color3.fromRGB(100, 160, 255),
         Border     = Color3.fromRGB(55, 55, 65),
     },
     Light = {
         Background = Color3.fromRGB(235, 235, 240),
         TopBar     = Color3.fromRGB(210, 210, 220),
+        Sidebar    = Color3.fromRGB(200, 200, 212),
         Accent     = Color3.fromRGB(60, 120, 220),
         Border     = Color3.fromRGB(180, 180, 190),
     },
     Midnight = {
         Background = Color3.fromRGB(10, 10, 20),
         TopBar     = Color3.fromRGB(5, 5, 15),
+        Sidebar    = Color3.fromRGB(8, 8, 18),
         Accent     = Color3.fromRGB(150, 80, 255),
         Border     = Color3.fromRGB(40, 40, 60),
     },
     Crimson = {
         Background = Color3.fromRGB(28, 15, 15),
         TopBar     = Color3.fromRGB(18, 8, 8),
+        Sidebar    = Color3.fromRGB(20, 10, 10),
         Accent     = Color3.fromRGB(220, 60, 60),
         Border     = Color3.fromRGB(70, 30, 30),
     },
     Forest = {
         Background = Color3.fromRGB(15, 28, 18),
         TopBar     = Color3.fromRGB(8, 18, 10),
+        Sidebar    = Color3.fromRGB(10, 22, 13),
         Accent     = Color3.fromRGB(60, 200, 100),
         Border     = Color3.fromRGB(30, 65, 38),
     },
     Ocean = {
         Background = Color3.fromRGB(12, 22, 35),
         TopBar     = Color3.fromRGB(7, 14, 25),
+        Sidebar    = Color3.fromRGB(9, 18, 30),
         Accent     = Color3.fromRGB(0, 180, 220),
         Border     = Color3.fromRGB(20, 50, 80),
     },
@@ -119,8 +124,8 @@ function GuiLib:CreateWindow(config)
     -- Основной фрейм
     local frame = Instance.new("Frame")
     frame.Name = "Window"
-    frame.Size = UDim2.new(0, 420, 0, 500)
-    frame.Position = UDim2.new(0.5, -210, 0.5, -250)
+    frame.Size = UDim2.new(0, 560, 0, 520)
+    frame.Position = UDim2.new(0.5, -280, 0.5, -260)
     frame.BackgroundColor3 = theme.Background
     frame.BackgroundTransparency = theme.Transparency
     frame.BorderSizePixel = 0
@@ -128,37 +133,13 @@ function GuiLib:CreateWindow(config)
     addCorner(frame)
     local frameStroke = addStroke(frame, theme.Border)
 
-    -- Фоновая картинка
-    local bgImage = Instance.new("ImageLabel")
-    bgImage.Name = "BgImage"
-    bgImage.Size = UDim2.new(1, 0, 1, 0)
-    bgImage.BackgroundTransparency = 1
-    bgImage.Image = config.BackgroundImage or ""
-    bgImage.ImageTransparency = config.BackgroundImage and 0 or 1
-    bgImage.ScaleType = Enum.ScaleType.Crop
-    bgImage.ZIndex = 2
-    bgImage.Parent = frame
-    addCorner(bgImage)
-
-    -- Затемнение поверх картинки
-    local bgOverlay = Instance.new("Frame")
-    bgOverlay.Name = "BgOverlay"
-    bgOverlay.Size = UDim2.new(1, 0, 1, 0)
-    bgOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    bgOverlay.BackgroundTransparency = config.BackgroundImage and 0.4 or 1
-    bgOverlay.BorderSizePixel = 0
-    bgOverlay.ZIndex = 3
-    bgOverlay.Parent = frame
-    addCorner(bgOverlay)
-
     -- Топбар
     local topBar = Instance.new("Frame")
     topBar.Name = "TopBar"
-    topBar.Size = UDim2.new(1, 0, 0, 40)
+    topBar.Size = UDim2.new(1, 0, 0, 42)
     topBar.BackgroundColor3 = theme.TopBar
     topBar.BackgroundTransparency = theme.Transparency
     topBar.BorderSizePixel = 0
-    topBar.ZIndex = 4
     topBar.Parent = frame
     addCorner(topBar)
 
@@ -168,18 +149,16 @@ function GuiLib:CreateWindow(config)
     patch.BackgroundColor3 = theme.TopBar
     patch.BackgroundTransparency = theme.Transparency
     patch.BorderSizePixel = 0
-    patch.ZIndex = 4
     patch.Parent = topBar
 
     -- Акцентная полоса
-    local accent = Instance.new("Frame")
-    accent.Size = UDim2.new(0, 3, 1, -16)
-    accent.Position = UDim2.new(0, 10, 0, 8)
-    accent.BackgroundColor3 = theme.Accent
-    accent.BorderSizePixel = 0
-    accent.ZIndex = 5
-    accent.Parent = topBar
-    addCorner(accent, UDim.new(1, 0))
+    local accentBar = Instance.new("Frame")
+    accentBar.Size = UDim2.new(0, 3, 1, -16)
+    accentBar.Position = UDim2.new(0, 10, 0, 8)
+    accentBar.BackgroundColor3 = theme.Accent
+    accentBar.BorderSizePixel = 0
+    accentBar.Parent = topBar
+    addCorner(accentBar, UDim.new(1, 0))
 
     -- Заголовок
     local titleLabel = Instance.new("TextLabel")
@@ -191,21 +170,19 @@ function GuiLib:CreateWindow(config)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextSize = 14
-    titleLabel.ZIndex = 5
     titleLabel.Parent = topBar
 
     -- Кнопка закрытия
     local closeBtn = Instance.new("TextButton")
     closeBtn.Text = "✕"
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
-    closeBtn.Position = UDim2.new(1, -38, 0, 5)
+    closeBtn.Position = UDim2.new(1, -38, 0, 6)
     closeBtn.BackgroundColor3 = Color3.fromRGB(200, 70, 70)
     closeBtn.TextColor3 = theme.Text
     closeBtn.Font = Enum.Font.GothamBold
     closeBtn.TextSize = 13
     closeBtn.BorderSizePixel = 0
     closeBtn.AutoButtonColor = false
-    closeBtn.ZIndex = 5
     closeBtn.Parent = topBar
     addCorner(closeBtn, UDim.new(0, 6))
 
@@ -247,40 +224,251 @@ function GuiLib:CreateWindow(config)
         end
     end)
 
-    -- Контент
-    local content = Instance.new("ScrollingFrame")
-    content.Name = "Content"
-    content.Size = UDim2.new(1, -20, 1, -60)
-    content.Position = UDim2.new(0, 10, 0, 50)
-    content.BackgroundTransparency = 1
-    content.BorderSizePixel = 0
-    content.ScrollBarThickness = 3
-    content.ScrollBarImageColor3 = theme.Accent
-    content.CanvasSize = UDim2.new(0, 0, 0, 0)
-    content.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    content.ZIndex = 4
-    content.Parent = frame
+    -- =====================
+    --  Сайдбар (слева)
+    -- =====================
+    local sidebar = Instance.new("Frame")
+    sidebar.Name = "Sidebar"
+    sidebar.Size = UDim2.new(0, 130, 1, -50)
+    sidebar.Position = UDim2.new(0, 8, 0, 50)
+    sidebar.BackgroundColor3 = theme.Sidebar
+    sidebar.BorderSizePixel = 0
+    sidebar.Parent = frame
+    addCorner(sidebar)
+    addStroke(sidebar, theme.Border)
+
+    -- Лого/иконка вверху сайдбара
+    local logoFrame = Instance.new("Frame")
+    logoFrame.Size = UDim2.new(1, -16, 0, 60)
+    logoFrame.Position = UDim2.new(0, 8, 0, 8)
+    logoFrame.BackgroundTransparency = 1
+    logoFrame.Parent = sidebar
+
+    local logoIcon = Instance.new("TextLabel")
+    logoIcon.Text = config.Icon or "✦"
+    logoIcon.Size = UDim2.new(0, 28, 0, 28)
+    logoIcon.Position = UDim2.new(0.5, -14, 0, 6)
+    logoIcon.BackgroundTransparency = 1
+    logoIcon.TextColor3 = theme.Accent
+    logoIcon.Font = Enum.Font.GothamBold
+    logoIcon.TextSize = 20
+    logoIcon.Parent = logoFrame
+
+    local logoTitle = Instance.new("TextLabel")
+    logoTitle.Text = config.Title or "Menu"
+    logoTitle.Size = UDim2.new(1, 0, 0, 18)
+    logoTitle.Position = UDim2.new(0, 0, 0, 36)
+    logoTitle.BackgroundTransparency = 1
+    logoTitle.TextColor3 = theme.TextDim
+    logoTitle.Font = Enum.Font.Gotham
+    logoTitle.TextSize = 10
+    logoTitle.Parent = logoFrame
+
+    -- Разделитель
+    local divider = Instance.new("Frame")
+    divider.Size = UDim2.new(1, -16, 0, 1)
+    divider.Position = UDim2.new(0, 8, 0, 72)
+    divider.BackgroundColor3 = theme.Border
+    divider.BorderSizePixel = 0
+    divider.Parent = sidebar
+
+    -- Список вкладок
+    local tabList = Instance.new("ScrollingFrame")
+    tabList.Size = UDim2.new(1, 0, 1, -82)
+    tabList.Position = UDim2.new(0, 0, 0, 80)
+    tabList.BackgroundTransparency = 1
+    tabList.BorderSizePixel = 0
+    tabList.ScrollBarThickness = 0
+    tabList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tabList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    tabList.Parent = sidebar
+
+    local tabListLayout = Instance.new("UIListLayout")
+    tabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tabListLayout.Padding = UDim.new(0, 4)
+    tabListLayout.Parent = tabList
+
+    local tabListPadding = Instance.new("UIPadding")
+    tabListPadding.PaddingLeft = UDim.new(0, 6)
+    tabListPadding.PaddingRight = UDim.new(0, 6)
+    tabListPadding.PaddingTop = UDim.new(0, 4)
+    tabListPadding.Parent = tabList
+
+    -- =====================
+    --  Контент (справа)
+    -- =====================
+    local contentArea = Instance.new("Frame")
+    contentArea.Name = "ContentArea"
+    contentArea.Size = UDim2.new(1, -148, 1, -58)
+    contentArea.Position = UDim2.new(0, 146, 0, 50)
+    contentArea.BackgroundTransparency = 1
+    contentArea.BorderSizePixel = 0
+    contentArea.Parent = frame
+
+    -- Объект окна
+    local window = setmetatable({}, GuiLib)
+    window._frame       = frame
+    window._topBar      = topBar
+    window._patch       = patch
+    window._accentBar   = accentBar
+    window._stroke      = frameStroke
+    window._sidebar     = sidebar
+    window._tabList     = tabList
+    window._contentArea = contentArea
+    window._theme       = theme
+    window._titleLbl    = titleLabel
+    window._tabs        = {}
+    window._activeTab   = nil
+
+    return window
+end
+
+-- =====================
+--  :AddTab(config)
+-- =====================
+function GuiLib:AddTab(config)
+    if type(config) == "string" then
+        config = { Title = config }
+    end
+    config = config or {}
+
+    local theme = self._theme
+    local isFirst = #self._tabs == 0
+
+    -- Кнопка вкладки в сайдбаре
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Name = "Tab_" .. (config.Title or "Tab")
+    tabBtn.Size = UDim2.new(1, 0, 0, 36)
+    tabBtn.BackgroundColor3 = isFirst and theme.Accent or theme.Sidebar
+    tabBtn.BackgroundTransparency = isFirst and 0 or 1
+    tabBtn.Text = ""
+    tabBtn.BorderSizePixel = 0
+    tabBtn.AutoButtonColor = false
+    tabBtn.Parent = self._tabList
+    addCorner(tabBtn, UDim.new(0, 6))
+
+    -- Активный индикатор слева
+    local indicator = Instance.new("Frame")
+    indicator.Size = UDim2.new(0, 3, 0.55, 0)
+    indicator.Position = UDim2.new(0, 0, 0.225, 0)
+    indicator.BackgroundColor3 = theme.Text
+    indicator.BackgroundTransparency = isFirst and 0 or 1
+    indicator.BorderSizePixel = 0
+    indicator.Parent = tabBtn
+    addCorner(indicator, UDim.new(1, 0))
+
+    -- Иконка вкладки
+    local tabIcon = Instance.new("TextLabel")
+    tabIcon.Text = config.Icon or "◈"
+    tabIcon.Size = UDim2.new(0, 24, 1, 0)
+    tabIcon.Position = UDim2.new(0, 8, 0, 0)
+    tabIcon.BackgroundTransparency = 1
+    tabIcon.TextColor3 = isFirst and theme.Text or theme.TextDim
+    tabIcon.Font = Enum.Font.GothamBold
+    tabIcon.TextSize = 14
+    tabIcon.Parent = tabBtn
+
+    -- Текст вкладки
+    local tabText = Instance.new("TextLabel")
+    tabText.Text = config.Title or "Tab"
+    tabText.Size = UDim2.new(1, -36, 1, 0)
+    tabText.Position = UDim2.new(0, 34, 0, 0)
+    tabText.BackgroundTransparency = 1
+    tabText.TextColor3 = isFirst and theme.Text or theme.TextDim
+    tabText.TextXAlignment = Enum.TextXAlignment.Left
+    tabText.Font = Enum.Font.Gotham
+    tabText.TextSize = 12
+    tabText.Parent = tabBtn
+
+    -- Контент вкладки
+    local tabContent = Instance.new("ScrollingFrame")
+    tabContent.Name = "Content_" .. (config.Title or "Tab")
+    tabContent.Size = UDim2.new(1, -8, 1, -8)
+    tabContent.Position = UDim2.new(0, 0, 0, 4)
+    tabContent.BackgroundTransparency = 1
+    tabContent.BorderSizePixel = 0
+    tabContent.ScrollBarThickness = 3
+    tabContent.ScrollBarImageColor3 = theme.Accent
+    tabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tabContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    tabContent.Visible = isFirst
+    tabContent.Parent = self._contentArea
 
     local listLayout = Instance.new("UIListLayout")
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Padding = UDim.new(0, 6)
-    listLayout.Parent = content
+    listLayout.Parent = tabContent
 
-    -- Объект окна
-    local window = setmetatable({}, GuiLib)
-    window._frame     = frame
-    window._topBar    = topBar
-    window._patch     = patch
-    window._accent    = accent
-    window._bgImage   = bgImage
-    window._bgOverlay = bgOverlay
-    window._stroke    = frameStroke
-    window._content   = content
-    window._theme     = theme
-    window._titleLbl  = titleLabel
-    window._scrollbar = content
+    local contentPadding = Instance.new("UIPadding")
+    contentPadding.PaddingRight = UDim.new(0, 4)
+    contentPadding.Parent = tabContent
 
-    return window
+    -- Объект вкладки
+    local tabObj = {
+        _btn       = tabBtn,
+        _icon      = tabIcon,
+        _text      = tabText,
+        _indicator = indicator,
+        _content   = tabContent,
+        _window    = self,
+    }
+    setmetatable(tabObj, { __index = self })
+    tabObj._content   = tabContent
+    tabObj._theme     = theme
+
+    table.insert(self._tabs, tabObj)
+    if isFirst then self._activeTab = tabObj end
+
+    -- ── Переключение вкладок ──
+    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+    local function activateTab()
+        if self._activeTab == tabObj then return end
+
+        -- Деактивируем старую
+        local prev = self._activeTab
+        if prev then
+            prev._content.Visible = false
+            TweenService:Create(prev._btn, tweenInfo, {
+                BackgroundColor3 = theme.Sidebar,
+                BackgroundTransparency = 1,
+            }):Play()
+            TweenService:Create(prev._icon, tweenInfo, { TextColor3 = theme.TextDim }):Play()
+            TweenService:Create(prev._text, tweenInfo, { TextColor3 = theme.TextDim }):Play()
+            TweenService:Create(prev._indicator, tweenInfo, { BackgroundTransparency = 1 }):Play()
+        end
+
+        -- Активируем новую
+        self._activeTab = tabObj
+        tabContent.Visible = true
+        TweenService:Create(tabBtn, tweenInfo, {
+            BackgroundColor3 = theme.Accent,
+            BackgroundTransparency = 0,
+        }):Play()
+        TweenService:Create(tabIcon, tweenInfo, { TextColor3 = theme.Text }):Play()
+        TweenService:Create(tabText, tweenInfo, { TextColor3 = theme.Text }):Play()
+        TweenService:Create(indicator, tweenInfo, { BackgroundTransparency = 0 }):Play()
+    end
+
+    -- Hover
+    tabBtn.MouseEnter:Connect(function()
+        if self._activeTab ~= tabObj then
+            TweenService:Create(tabBtn, tweenInfo, {
+                BackgroundColor3 = lighten(theme.Sidebar, 15),
+                BackgroundTransparency = 0,
+            }):Play()
+        end
+    end)
+    tabBtn.MouseLeave:Connect(function()
+        if self._activeTab ~= tabObj then
+            TweenService:Create(tabBtn, tweenInfo, {
+                BackgroundTransparency = 1,
+            }):Play()
+        end
+    end)
+    tabBtn.MouseButton1Click:Connect(activateTab)
+
+    return tabObj
 end
 
 -- =====================
@@ -290,17 +478,14 @@ function GuiLib:SetTheme(presetName)
     local preset = GuiLib.Themes[presetName]
     assert(preset, "GuiLib: unknown theme '" .. tostring(presetName) .. "'")
 
-    self._theme.Background = preset.Background
-    self._theme.TopBar     = preset.TopBar
-    self._theme.Accent     = preset.Accent
-    self._theme.Border     = preset.Border
+    for k, v in pairs(preset) do self._theme[k] = v end
 
-    self._frame.BackgroundColor3         = preset.Background
-    self._topBar.BackgroundColor3        = preset.TopBar
-    self._patch.BackgroundColor3         = preset.TopBar
-    self._accent.BackgroundColor3        = preset.Accent
-    self._stroke.Color                   = preset.Border
-    self._scrollbar.ScrollBarImageColor3 = preset.Accent
+    self._frame.BackgroundColor3    = preset.Background
+    self._topBar.BackgroundColor3   = preset.TopBar
+    self._patch.BackgroundColor3    = preset.TopBar
+    self._accentBar.BackgroundColor3 = preset.Accent
+    self._stroke.Color              = preset.Border
+    self._sidebar.BackgroundColor3  = preset.Sidebar
 end
 
 -- =====================
@@ -316,10 +501,11 @@ function GuiLib:SetColor(key, color)
         self._topBar.BackgroundColor3 = color
         self._patch.BackgroundColor3  = color
     elseif key == "Accent" then
-        self._accent.BackgroundColor3                = color
-        self._scrollbar.ScrollBarImageColor3         = color
+        self._accentBar.BackgroundColor3 = color
     elseif key == "Border" then
         self._stroke.Color = color
+    elseif key == "Sidebar" then
+        self._sidebar.BackgroundColor3 = color
     end
 end
 
@@ -327,57 +513,16 @@ end
 --  :SetTransparency(value)
 -- =====================
 function GuiLib:SetTransparency(value)
-    assert(type(value) == "number", "GuiLib:SetTransparency — ожидается number (0–1)")
     value = math.clamp(value, 0, 1)
     self._theme.Transparency = value
-
     self._frame.BackgroundTransparency  = value
     self._topBar.BackgroundTransparency = value
     self._patch.BackgroundTransparency  = value
 end
 
 -- =====================
---  :SetBackgroundImage(assetId, transparency, overlayTransparency)
---  assetId              = "rbxassetid://123456"
---  transparency         = прозрачность картинки 0–1
---  overlayTransparency  = прозрачность затемнения 0–1 (0.4 по умолчанию)
--- =====================
-function GuiLib:SetBackgroundImage(assetId, transparency, overlayTransparency)
-    self._bgImage.Image             = assetId or ""
-    self._bgImage.ImageTransparency = math.clamp(transparency or 0, 0, 1)
-    self._bgOverlay.BackgroundTransparency = math.clamp(overlayTransparency or 0.4, 0, 1)
-
-    -- Делаем фон окна прозрачным чтобы была видна картинка
-    self._frame.BackgroundTransparency  = 0.15
-    self._topBar.BackgroundTransparency = 0.3
-    self._patch.BackgroundTransparency  = 0.3
-end
-
--- =====================
---  :SetOverlayDim(value)
---  Затемнение поверх картинки 0–1
---  0 = нет затемнения, 1 = полностью чёрное
--- =====================
-function GuiLib:SetOverlayDim(value)
-    self._bgOverlay.BackgroundTransparency = math.clamp(1 - value, 0, 1)
-end
-
--- =====================
---  :RemoveBackgroundImage()
--- =====================
-function GuiLib:RemoveBackgroundImage()
-    self._bgImage.Image                    = ""
-    self._bgImage.ImageTransparency        = 1
-    self._bgOverlay.BackgroundTransparency = 1
-
-    -- Возвращаем непрозрачность
-    self._frame.BackgroundTransparency  = self._theme.Transparency
-    self._topBar.BackgroundTransparency = self._theme.Transparency
-    self._patch.BackgroundTransparency  = self._theme.Transparency
-end
-
--- =====================
 --  :AddButton(config)
+--  Вызывается на объекте вкладки: tab:AddButton({...})
 -- =====================
 function GuiLib:AddButton(config)
     if type(config) == "string" then
@@ -386,23 +531,20 @@ function GuiLib:AddButton(config)
     config = config or {}
 
     local theme = self._theme
+    local content = self._content
 
     local container = Instance.new("Frame")
     container.Name = "ButtonContainer"
     container.Size = UDim2.new(1, 0, 0, 42)
     container.BackgroundTransparency = 1
-    container.ZIndex = 5
-    container.Parent = self._content
+    container.Parent = content
 
     local btn = Instance.new("TextButton")
-    btn.Name = "Button"
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundColor3 = theme.TopBar
-    btn.TextColor3 = theme.Text
     btn.Text = ""
     btn.BorderSizePixel = 0
     btn.AutoButtonColor = false
-    btn.ZIndex = 5
     btn.Parent = container
     addCorner(btn)
     addStroke(btn, theme.Border)
@@ -412,7 +554,6 @@ function GuiLib:AddButton(config)
     leftBar.Position = UDim2.new(0, 0, 0.2, 0)
     leftBar.BackgroundColor3 = theme.Accent
     leftBar.BorderSizePixel = 0
-    leftBar.ZIndex = 6
     leftBar.Parent = btn
     addCorner(leftBar, UDim.new(1, 0))
 
@@ -424,10 +565,9 @@ function GuiLib:AddButton(config)
     iconLabel.TextColor3 = theme.Accent
     iconLabel.Font = Enum.Font.GothamBold
     iconLabel.TextSize = 16
-    iconLabel.ZIndex = 6
     iconLabel.Parent = btn
 
-    local textOffset = (config.Icon and 40) or 14
+    local textOffset = (config.Icon ~= nil and config.Icon ~= "") and 40 or 14
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, -textOffset - 10, 1, 0)
     label.Position = UDim2.new(0, textOffset, 0, 0)
@@ -437,14 +577,12 @@ function GuiLib:AddButton(config)
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Font = Enum.Font.Gotham
     label.TextSize = 13
-    label.ZIndex = 6
     label.Parent = btn
 
     if config.Description then
         label.Size = UDim2.new(1, -textOffset - 10, 0.45, 0)
         label.Position = UDim2.new(0, textOffset, 0.08, 0)
         label.Font = Enum.Font.GothamBold
-        label.TextSize = 13
 
         local sub = Instance.new("TextLabel")
         sub.Size = UDim2.new(1, -textOffset - 10, 0.38, 0)
@@ -455,7 +593,6 @@ function GuiLib:AddButton(config)
         sub.TextXAlignment = Enum.TextXAlignment.Left
         sub.Font = Enum.Font.Gotham
         sub.TextSize = 11
-        sub.ZIndex = 6
         sub.Parent = btn
     end
 
@@ -467,21 +604,17 @@ function GuiLib:AddButton(config)
     arrow.TextColor3 = theme.Accent
     arrow.Font = Enum.Font.GothamBold
     arrow.TextSize = 22
-    arrow.ZIndex = 6
     arrow.Parent = btn
 
     local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-    local function animateTo(bgColor, arrowOffset)
-        TweenService:Create(btn, tweenInfo, { BackgroundColor3 = bgColor }):Play()
-        TweenService:Create(arrow, tweenInfo, { Position = UDim2.new(1, arrowOffset, 0, 0) }):Play()
-    end
-
     btn.MouseEnter:Connect(function()
-        animateTo(lighten(theme.TopBar, 18), -22)
+        TweenService:Create(btn, tweenInfo, { BackgroundColor3 = lighten(theme.TopBar, 18) }):Play()
+        TweenService:Create(arrow, tweenInfo, { Position = UDim2.new(1, -22, 0, 0) }):Play()
     end)
     btn.MouseLeave:Connect(function()
-        animateTo(theme.TopBar, -28)
+        TweenService:Create(btn, tweenInfo, { BackgroundColor3 = theme.TopBar }):Play()
+        TweenService:Create(arrow, tweenInfo, { Position = UDim2.new(1, -28, 0, 0) }):Play()
     end)
     btn.MouseButton1Down:Connect(function()
         TweenService:Create(btn, TweenInfo.new(0.08), { BackgroundColor3 = theme.Accent }):Play()
@@ -496,11 +629,7 @@ function GuiLib:AddButton(config)
     end)
 
     local buttonObj = {}
-
-    function buttonObj:SetText(text)
-        label.Text = text
-    end
-
+    function buttonObj:SetText(text) label.Text = text end
     function buttonObj:SetEnabled(enabled)
         btn.Active = enabled
         btn.BackgroundTransparency = enabled and 0 or 0.5
